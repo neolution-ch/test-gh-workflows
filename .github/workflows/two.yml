@@ -15,7 +15,6 @@ jobs:
         with:
           name: analysis-results
           run-id: ${{ github.event.workflow_run.id }}
-          github-token: ${{ secrets.GITHUB_TOKEN }}
 
       - run: |
           echo "This is a comment on the PR based on the analysis results:"
