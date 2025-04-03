@@ -1,0 +1,21 @@
+﻿name: Comment on PR
+on:
+  workflow_run:
+    workflows: ["Workflow One"] # Runs only after Workflow 1 completes
+    types:
+      - completed
+
+jobs:
+  comment:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }} # Runs only if Workflow 1 was successful
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download analysis results
+        uses: actions/download-artifact@v4
+        with:
+          name: analysis-results
+
+      - run: |
+          echo "This is a comment on the PR based on the analysis results:"
+          cat result.txt
+          echo "----------------------------------"

@@ -1,0 +1,20 @@
+﻿name: Workflow One
+on:
+  push:
+    branches: [main]
+
+jobs:
+  analyze:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout PR code
+        uses: actions/checkout@v4
+
+      - name: Run analysis
+        run: echo "✅ CI analysis completed for this PR!" > result.txt
+
+      - name: Upload analysis results
+        uses: actions/upload-artifact@v4
+        with:
+          name: analysis-results
+          path: result.txt
