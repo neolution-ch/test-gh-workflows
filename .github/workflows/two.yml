@@ -1,24 +1,35 @@
 ﻿name: Comment on PR
 on:
   workflow_run:
-    workflows: ["Workflow One"] # Runs only after Workflow 1 completes
+    workflows: ["Workflow One"] # Runs only after Workflow One completes
     types:
       - completed
 
 jobs:
   comment:
-    if: ${{ github.event.workflow_run.conclusion == 'success' }} # Runs only if Workflow 1 was successful
+    if: ${{ github.event.workflow_run.conclusion == 'success' }} # Runs only if Workflow One was successful
     runs-on: ubuntu-latest
     steps:
-      - run: sleep 30 # Wait for 30 seconds to ensure the artifact is available
+      - name: Fetch Artifact URL
+        run: |
+          ARTIFACT_URL=$(curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+            "https://api.github.com/repos/${{ github.repository }}/actions/runs/${{ github.event.workflow_run.id }}/artifacts" \
+            | jq -r '.artifacts[] | select(.name=="analysis-results") | .archive_download_url')
 
-      - name: Download analysis results
-        uses: actions/download-artifact@v4
-        with:
-          name: analysis-results
-          run-id: ${{ github.event.workflow_run.id }}
+          if [[ "$ARTIFACT_URL" == "null" ]]; then
+            echo "❌ No artifact found. Exiting."
+            exit 1
+          fi
 
-      - run: |
-          echo "This is a comment on the PR based on the analysis results:"
+          echo "Downloading artifact from: $ARTIFACT_URL"
+          curl -s -L -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" -o artifact.zip "$ARTIFACT_URL"
+          unzip artifact.zip
+
+      - name: Post a comment on PR
+        run: |
+          echo "📢 Commenting on PR:"
+          echo $PR_URL
           cat result.txt
-          echo "----------------------------------"
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_URL: ${{ github.event.workflow_run.pull_requests[0].html_url }}
