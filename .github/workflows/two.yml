@@ -17,10 +17,17 @@ jobs:
           run-id: ${{ github.event.workflow_run.id }}
           github-token: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: log whole github context
+        run: |
+          echo "GITHUB_CONTEXT: ${{ toJson(github) }}"
+          echo "GITHUB_EVENT_CONTEXT: ${{ toJson(github.event) }}"
+          echo "GITHUB_WORKFLOW_CONTEXT: ${{ toJson(github.workflow) }}"
+
       - name: Get PR Number from GitHub API (for forks)
         id: get_pr_number
         run: |
-          if [[ "${{ github.event.repository.fork }}" == "true" ]]; then
+          if [[ "${{ github.event.workflow_run.head_repository.fork }}" == "true" ]]; then
+            echo "This is a forked repository."
             pr_number=$(curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
               "https://api.github.com/repos/${{ github.repository }}/pulls?head=${{ github.actor }}:${{ github.head_ref }}" \
               | jq '.[0].number')
