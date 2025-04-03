@@ -10,8 +10,6 @@ jobs:
     if: ${{ github.event.workflow_run.conclusion == 'success' }} # Runs only if Workflow 1 was successful
     runs-on: ubuntu-latest
     steps:
-      - run: sleep 30 # Wait for 30 seconds to ensure the artifact is available
-
       - name: Download analysis results
         uses: actions/download-artifact@v4
         with:
