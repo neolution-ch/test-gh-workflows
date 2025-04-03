@@ -17,6 +17,12 @@ jobs:
           run-id: ${{ github.event.workflow_run.id }}
           github-token: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: log whole github context
+        run: |
+          echo "GITHUB_CONTEXT: ${{ toJson(github) }}"
+          echo "GITHUB_EVENT_CONTEXT: ${{ toJson(github.event) }}"
+          echo "GITHUB_WORKFLOW_CONTEXT: ${{ toJson(github.workflow) }}"
+
       - name: Get PR Number from GitHub API (for forks)
         id: get_pr_number
         run: |
