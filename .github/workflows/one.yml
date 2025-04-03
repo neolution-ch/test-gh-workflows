@@ -1,7 +1,8 @@
 ﻿name: Workflow One
 on:
-  push:
-    branches: [main]
+  pull_request:
+    branches: [main, develop]
+    types: [opened, synchronize, ready_for_review]
 
 jobs:
   analyze:
